@@ -1,0 +1,74 @@
+import mongoose, { Schema, Document } from "mongoose";
+
+export type UserRole = "Trainer" | "Member" | "Admin";
+
+export interface IUser extends Document {
+  fullName: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  avatarUrl?: string;
+  isOnboarded: boolean;
+  trainerProfile?: {
+    bio: string;
+    experties: string[];
+    certifications: string[];
+    yearsOfExperience?: number;
+    hourlyRate?: number;
+    location?: string;
+    availability?: string[];
+  };
+  memberProfile?: {
+    goals: string[];
+    fitnessLevel: string;
+    gender?: "Male" | "Female" | "Other";
+    dob?: Date;
+    healthCondition: string[];
+    preferredTrainingStyle?: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const UserSchema = new Schema<IUser>(
+  {
+    fullName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+
+    role: {
+      type: String,
+      enum: ["Trainer", "Member", "Admin"],
+      require: true,
+    },
+
+    avatarUrl: { type: String },
+    isOnboarded: { type: Boolean, default: false },
+
+    trainerProfile: {
+      bio: { type: String },
+      experties: [{ type: String }],
+      certifications: [{ type: String }],
+      yearsOfExperience: { type: Number },
+      hourlyRate: { type: Number },
+      location: { type: String },
+      availability: [{ type: String }],
+    },
+
+    memberProfile: {
+      goals: [{ type: String }],
+      fitnessLevel: { type: String },
+      gender: { type: String, enum: ["Male", "Female", "Other"] },
+      dob: { type: Date },
+      healthCondition: [{ type: String }],
+      prefferedTrainingStyle: { type: String },
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const User =
+  mongoose.models.users || mongoose.model<IUser>("users", UserSchema);
+export default User;
