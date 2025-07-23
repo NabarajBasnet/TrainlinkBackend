@@ -1,7 +1,6 @@
 import ConnectDatabase from "../../config/db";
 import User from "../../models/Users/Users";
 import bcryptjs from "bcryptjs";
-const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
 import jwt from "jsonwebtoken";
 
 export const SignUpUser = async (req: any, res: any) => {
@@ -61,14 +60,16 @@ export const LogInUser = async (req: any, res: any) => {
     // Generate JWT token
     const token = jwt.sign(
       {
-        userId: user._id,
+        id: user._id,
         role: user.role,
       },
-      JWT_SECRET,
+      process.env.JWT_SECRET,
       {
         expiresIn: process.env.JWT_EXPIRES_IN || "7d",
       }
     );
+
+    console.log("Token from cookie:", req.cookies.token);
 
     // Check environment
     const isProd = process.env.NODE_ENV === "production";
