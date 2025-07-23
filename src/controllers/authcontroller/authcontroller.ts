@@ -1,11 +1,33 @@
 import ConnectDatabase from "../../config/db";
 import User from "../../models/Users/Users";
+import bcryptjs from "bcryptjs";
+const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
+import jwt from "jsonwebtoken";
 
 export const SignUpUser = async (req: any, res: any) => {
   try {
     await ConnectDatabase();
 
-    const newUser = await new User(req.body);
+    const { fullName, email, password, role } = req.body;
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
+
+    const existenceUser = await User.findOne({ email: email, role: role });
+    if (existenceUser) {
+      res.status(401).json({
+        message: "User is already registered",
+        redirect: "/auth",
+      });
+    }
+
+    const finalData = {
+      fullName,
+      email,
+      password: hashedPassword,
+      role,
+    };
+
+    const newUser = await new User(finalData);
     await newUser.save();
 
     res.status(200).json({
@@ -13,10 +35,9 @@ export const SignUpUser = async (req: any, res: any) => {
       redirect: "/auth",
     });
   } catch (error: any) {
-    console.log("Error: ", error.message);
+    console.log("Error: ", error);
     res.status(500).json({
       message: error.message,
-      error:error.message
     });
   }
 };
@@ -25,16 +46,49 @@ export const LogInUser = async (req: any, res: any) => {
   try {
     await ConnectDatabase();
 
-    console.log("Login: ", req.body);
-    res.status(200).json({
-      message: "Login successfull",
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        role: user.role,
+      },
+      JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+      }
+    );
+
+    // Check environment
+    const isProd = process.env.NODE_ENV === "production";
+
+    // Set cookie options
+    res.setHeader(
+      "Set-Cookie",
+      `token=${token}; HttpOnly; Path=/; Max-Age=604800; ${
+        isProd ? "Secure; SameSite=None;" : "SameSite=Lax;"
+      }`
+    );
+
+    return res.status(200).json({
+      message: "Login successful",
       redirect: "/dashboard",
-      token: "12345",
     });
   } catch (error: any) {
-    console.log("Error: ", error);
-    res.status(500).json({
-      message: error.message,
+    console.error("Login error:", error);
+    return res.status(500).json({
+      message: "Something went wrong",
     });
   }
 };
