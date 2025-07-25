@@ -7,6 +7,7 @@ import corsOptions from "../src/config/cors";
 import authRoutes from "./routes/authroutes/authroutes";
 import userRoutes from "./routes/usersRoutes/usersRoutes";
 import dotenv from "dotenv";
+import fileUploadRoutes from "./routes/fileupload/fileuploadRoute";
 
 // Load env variables
 dotenv.config();
@@ -24,6 +25,9 @@ app.use("/api", authRoutes);
 
 // User Routes
 app.use("/api", userRoutes);
+
+// File Upload Routes
+app.use("/api", fileUploadRoutes);
 
 const server = http.createServer(app);
 const io = new Server(server);
