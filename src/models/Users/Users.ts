@@ -13,7 +13,12 @@ export interface IUser extends Document {
   trainerProfile?: {
     bio: string;
     experties: string[];
-    certifications: string[];
+    certifications: {
+      name: string;
+      issuingOrganization: string;
+      yearObtained?: number;
+      certificationId?: string;
+    }[];
     yearsOfExperience?: number;
     priceRange?: number;
     location?: string[];
@@ -52,7 +57,16 @@ const UserSchema = new Schema<IUser>(
     trainerProfile: {
       bio: { type: String },
       experties: [{ type: String }],
-      certifications: [{ type: String }],
+
+      certifications: [
+        {
+          name: { type: String, required: true },
+          issuingOrganization: { type: String, required: true },
+          yearObtained: { type: Number },
+          certificationId: { type: String },
+        },
+      ],
+
       yearsOfExperience: { type: Number },
       priceRange: { type: Number },
       location: { type: String },
