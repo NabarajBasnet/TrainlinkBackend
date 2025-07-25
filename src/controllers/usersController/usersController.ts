@@ -3,9 +3,10 @@ import jwt from "jsonwebtoken";
 import User from "../../models/Users/Users";
 import fs from "fs";
 import { log } from "console";
+import { Request, Response } from "express";
 import uploadOnCloudinary from "../../utils/ImageUpload/cloudinary";
 
-export const loggedInUserDetails = async (req: any, res: any) => {
+export const loggedInUserDetails = async (req: Request, res: Response) => {
   try {
     await ConnectDatabase();
 
@@ -38,7 +39,7 @@ export const loggedInUserDetails = async (req: any, res: any) => {
   }
 };
 
-export async function updateUserAvatar(req: any, res: any) {
+export async function updateUserAvatar(req: Request, res: Response) {
   try {
     await ConnectDatabase();
     const loggedInUser = jwt.verify(req.cookies.token, process.env.JWT_SECRET);
@@ -80,7 +81,7 @@ export async function updateUserAvatar(req: any, res: any) {
   }
 }
 
-export const addTrainerExperties = async (req: any, res: any) => {
+export const addTrainerExperties = async (req: Request, res: Response) => {
   try {
     await ConnectDatabase();
 
@@ -123,7 +124,7 @@ export const addTrainerExperties = async (req: any, res: any) => {
   }
 };
 
-export const updateBioDetails = async (req: any, res: any) => {
+export const updateBioDetails = async (req: Request, res: Response) => {
   try {
     await ConnectDatabase();
 
@@ -161,7 +162,10 @@ export const updateBioDetails = async (req: any, res: any) => {
   }
 };
 
-export const updateCertificationDetails = async (req: any, res: any) => {
+export const updateCertificationDetails = async (
+  req: Request,
+  res: Response
+) => {
   try {
     await ConnectDatabase();
 
@@ -220,7 +224,7 @@ export const updateCertificationDetails = async (req: any, res: any) => {
 };
 
 // Members conrollers
-export const editFitnessGoals = async (req: any, res: any) => {
+export const editFitnessGoals = async (req: Request, res: Response) => {
   try {
     await ConnectDatabase();
 
@@ -256,6 +260,52 @@ export const editFitnessGoals = async (req: any, res: any) => {
     console.log("Error: ", error);
     res.status(500).json({
       message: error.message || "Failed to update certifications",
+    });
+  }
+};
+
+export const removeFitnessGoal = async (req: Request, res: Response) => {
+  try {
+    await ConnectDatabase();
+
+    const JWT_TOKEN = process.env.JWT_SECRET;
+    if (!JWT_TOKEN) {
+      throw new Error("JWT_SECRET is not defined in env");
+    }
+
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const loggedInUser = jwt.verify(token, JWT_TOKEN) as { id: string };
+    const { id } = loggedInUser;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { goal: goalToRemove } = req.body;
+
+    const prevGoals = user.memberProfile.goals || [];
+
+    // Remove specified goals
+    const updatedGoals = prevGoals.filter(
+      (goal: string) => !goalToRemove.includes(goal)
+    );
+
+    user.memberProfile.goals = updatedGoals;
+    await user.save();
+
+    res.status(200).json({
+      message: "Goal(s) removed successfully",
+      updatedGoals,
+    });
+  } catch (error: any) {
+    console.error("Error: ", error);
+    res.status(500).json({
+      message: error.message || "Failed to remove fitness goals",
     });
   }
 };
