@@ -17,6 +17,8 @@ export interface IUser extends Document {
     hourlyRate?: number;
     location?: string;
     availability?: string[];
+    ratings?: number;
+    setupStage?: number;
   };
   memberProfile?: {
     goals: string[];
@@ -53,6 +55,8 @@ const UserSchema = new Schema<IUser>(
       hourlyRate: { type: Number },
       location: { type: String },
       availability: [{ type: String }],
+      ratings: { type: Number, default: 1 },
+      setupStage: { type: Number, default: 1 },
     },
 
     memberProfile: {

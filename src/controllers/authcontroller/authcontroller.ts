@@ -69,8 +69,6 @@ export const LogInUser = async (req: any, res: any) => {
       }
     );
 
-    console.log("Token from cookie:", req.cookies.token);
-
     // Check environment
     const isProd = process.env.NODE_ENV === "production";
 
@@ -90,6 +88,30 @@ export const LogInUser = async (req: any, res: any) => {
     console.error("Login error:", error);
     return res.status(500).json({
       message: "Something went wrong",
+    });
+  }
+};
+
+export const LogOutUser = async (req: any, res: any) => {
+  try {
+    // Check environment
+    const isProd = process.env.NODE_ENV === "production";
+
+    // Clear the cookie by setting it with expired date
+    res.setHeader("Set-Cookie", [
+      `token=; HttpOnly; Path=/; Max-Age=0; ${
+        isProd ? "Secure; SameSite=None;" : "SameSite=Lax;"
+      }`,
+    ]);
+
+    return res.status(200).json({
+      message: "Logout successful",
+      redirect: "/auth",
+    });
+  } catch (error: any) {
+    console.error("Logout error:", error);
+    return res.status(500).json({
+      message: "Something went wrong during logout",
     });
   }
 };
