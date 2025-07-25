@@ -17,9 +17,6 @@ export default async function uploadOnCloudinary(localPath: string) {
     const result = await cloudinary.v2.uploader.upload(localPath, {
       resource_type: "auto",
     });
-
-    console.log("File uploaded");
-    console.log("Result: ", result);
     return result;
   } catch (error) {
     log(error);

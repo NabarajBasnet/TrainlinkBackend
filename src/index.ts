@@ -1,16 +1,16 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 import http from "http";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
 import corsOptions from "../src/config/cors";
 import authRoutes from "./routes/authroutes/authroutes";
 import userRoutes from "./routes/usersRoutes/usersRoutes";
-import dotenv from "dotenv";
 import fileUploadRoutes from "./routes/fileupload/fileuploadRoute";
 
 // Load env variables
-dotenv.config();
 const port = process.env.PORT || 4000;
 const app = express();
 

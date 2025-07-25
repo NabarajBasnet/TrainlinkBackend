@@ -2,7 +2,8 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 
-const tempDir = path.join(__dirname, "..", "public", "temp");
+// Save to root/public/temp (not inside src/)
+const tempDir = path.join(__dirname, "..", "..", "public", "temp");
 
 // Create folder if it doesn't exist
 if (!fs.existsSync(tempDir)) {
@@ -21,5 +22,5 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 export default upload;
