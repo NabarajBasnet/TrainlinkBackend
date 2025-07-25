@@ -18,6 +18,8 @@ export interface IUser extends Document {
       issuingOrganization: string;
       yearObtained?: number;
       certificationId?: string;
+      isVerified?: boolean;
+      url?: string;
     }[];
     yearsOfExperience?: number;
     priceRange?: number;
@@ -64,6 +66,8 @@ const UserSchema = new Schema<IUser>(
           issuingOrganization: { type: String, required: true },
           yearObtained: { type: Number },
           certificationId: { type: String },
+          isVerified: { type: Boolean, default: false },
+          url: { type: String, default: "-" },
         },
       ],
 
