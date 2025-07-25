@@ -3,6 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export type UserRole = "Trainer" | "Member" | "Admin";
 
 export interface IUser extends Document {
+  userId: string;
   fullName: string;
   email: string;
   password: string;
@@ -14,8 +15,8 @@ export interface IUser extends Document {
     experties: string[];
     certifications: string[];
     yearsOfExperience?: number;
-    hourlyRate?: number;
-    location?: string;
+    priceRange?: number;
+    location?: string[];
     availability?: string[];
     ratings?: number;
     setupStage?: number;
@@ -34,6 +35,7 @@ export interface IUser extends Document {
 
 const UserSchema = new Schema<IUser>(
   {
+    userId: { type: String },
     fullName: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
@@ -52,7 +54,7 @@ const UserSchema = new Schema<IUser>(
       experties: [{ type: String }],
       certifications: [{ type: String }],
       yearsOfExperience: { type: Number },
-      hourlyRate: { type: Number },
+      priceRange: { type: Number },
       location: { type: String },
       availability: [{ type: String }],
       ratings: { type: Number, default: 1 },
