@@ -35,6 +35,7 @@ export interface IUser extends Document {
     dob?: Date;
     healthCondition: string[];
     preferredTrainingStyle?: string;
+    setupStage?: number;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -86,6 +87,10 @@ const UserSchema = new Schema<IUser>(
       dob: { type: Date },
       healthCondition: [{ type: String }],
       prefferedTrainingStyle: { type: String },
+      setupStage: {
+        type: Number,
+        default: 1,
+      },
     },
   },
   {
