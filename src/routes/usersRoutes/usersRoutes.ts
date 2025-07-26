@@ -4,6 +4,7 @@ import {
   editFitnessGoals,
   loggedInUserDetails,
   removeFitnessGoal,
+  shareFitnessGoal,
   updateBioDetails,
   updateCertificationDetails,
   updateUserAvatar,
@@ -22,5 +23,6 @@ router.route("/update-user-certifications").patch(updateCertificationDetails);
 // Member
 router.route("/edit-fitness-goal").patch(editFitnessGoals);
 router.route("/remove-fitness-goal").patch(removeFitnessGoal);
+router.route("/share-fitness-level").patch(shareFitnessGoal);
 
 export default router;
