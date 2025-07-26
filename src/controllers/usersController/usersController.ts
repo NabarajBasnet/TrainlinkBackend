@@ -290,19 +290,25 @@ export const removeFitnessGoal = async (req: Request, res: Response) => {
 
     const { goal: goalToRemove } = req.body;
 
-    const prevGoals = user.memberProfile.goals || [];
-
-    // Remove specified goals
-    const updatedGoals = prevGoals.filter(
-      (goal: string) => !goalToRemove.includes(goal)
-    );
-
-    user.memberProfile.goals = updatedGoals;
-    await user.save();
+    const userRole = user.role;
+    if (userRole === "Member") {
+      const prevGoals = user.memberProfile.goals || [];
+      const updatedGoals = prevGoals.filter(
+        (goal: string) => !goalToRemove.includes(goal)
+      );
+      user.memberProfile.goals = updatedGoals;
+      await user.save();
+    } else {
+      const prevExperties = user.trainerProfile.experties || [];
+      const updatedGoals = prevExperties.filter(
+        (goal: string) => !goalToRemove.includes(goal)
+      );
+      user.trainerProfile.experties = updatedGoals;
+      await user.save();
+    }
 
     res.status(200).json({
       message: "Goal(s) removed successfully",
-      updatedGoals,
     });
   } catch (error: any) {
     console.error("Error: ", error);

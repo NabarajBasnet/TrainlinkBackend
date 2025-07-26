@@ -24,7 +24,7 @@ router.route("/update-user-certifications").patch(updateCertificationDetails);
 
 // Member
 router.route("/edit-fitness-goal").patch(editFitnessGoals);
-router.route("/remove-fitness-goal").patch(removeFitnessGoal);
+router.route("/remove-fitness-goal-or-experties").patch(removeFitnessGoal);
 router.route("/share-fitness-level").patch(shareFitnessGoal);
 router.route("/share-health-condition").patch(shareHealthCondition);
 router.route("/update-personal-details").patch(changePersonalDetails);
