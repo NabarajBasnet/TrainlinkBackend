@@ -77,3 +77,34 @@ export const deleteSelectedPrograms = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const editProgram = async (req: Request, res: Response) => {
+  try {
+    await ConnectDatabase();
+
+    const { _id, ...updateData } = req.body.data;
+
+    if (!_id) {
+      return res.status(400).json({ message: "Program ID is required" });
+    }
+
+    const updatedProgram = await Program.findByIdAndUpdate(_id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedProgram) {
+      return res.status(404).json({ message: "Program not found" });
+    }
+
+    res.status(200).json({
+      message: "Program updated successfully",
+      program: updatedProgram,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
