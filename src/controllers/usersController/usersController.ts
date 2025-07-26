@@ -129,26 +129,28 @@ export const updateBioDetails = async (req: Request, res: Response) => {
     await ConnectDatabase();
 
     const JWT_TOKEN = process.env.JWT_SECRET;
-    if (!JWT_TOKEN) {
-      throw new Error("JWT_SECRET is not defined in env");
-    }
+    if (!JWT_TOKEN) throw new Error("JWT_SECRET is not defined in env");
 
     const token = req.cookies?.token;
-    if (!token) {
-      return res.status(401).json({ message: "No token provided" });
-    }
+    if (!token) return res.status(401).json({ message: "No token provided" });
 
-    const loggedInUser = jwt.verify(token, JWT_TOKEN);
+    const loggedInUser = jwt.verify(token, JWT_TOKEN) as { id: string };
     const { id } = loggedInUser;
     const { userBio } = req.body;
 
-    const user = await User.findById(id).select("password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.role === "Trainer") {
+      if (!user.trainerProfile) user.trainerProfile = {};
+      user.trainerProfile.bio = userBio;
+      user.trainerProfile.setupStage = 2;
+    } else {
+      if (!user.memberProfile) user.memberProfile = {};
+      user.memberProfile.fitnessJourney = userBio;
+      user.memberProfile.setupStage = 2;
     }
 
-    user.trainerProfile.bio = userBio;
-    user.setupStage = 2;
     await user.save();
 
     res.status(200).json({
@@ -157,7 +159,7 @@ export const updateBioDetails = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.log("Error: ", error);
     res.status(500).json({
-      message: error.mesage,
+      message: error.message || "Something went wrong",
     });
   }
 };
