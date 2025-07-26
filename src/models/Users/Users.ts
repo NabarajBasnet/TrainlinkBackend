@@ -34,7 +34,7 @@ export interface IUser extends Document {
     fitnessJourney: string;
     gender?: "Male" | "Female" | "Other";
     dob?: Date;
-    healthCondition: string[];
+    healthCondition: string;
     preferredTrainingStyle?: string;
     setupStage?: number;
   };
@@ -87,7 +87,7 @@ const UserSchema = new Schema<IUser>(
       fitnessJourney: { type: String },
       gender: { type: String, enum: ["Male", "Female", "Other"] },
       dob: { type: Date },
-      healthCondition: [{ type: String }],
+      healthCondition: { type: String },
       prefferedTrainingStyle: { type: String },
       setupStage: {
         type: Number,
