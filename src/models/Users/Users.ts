@@ -5,10 +5,13 @@ export type UserRole = "Trainer" | "Member" | "Admin";
 export interface IUser extends Document {
   user_id: string;
   fullName: string;
+  contactNo?: string;
   email: string;
+  socialMedia: string[];
   password: string;
   role: UserRole;
   avatarUrl?: string;
+  location?: string;
   isOnboarded: boolean;
   trainerProfile?: {
     bio: string;
@@ -46,7 +49,14 @@ const UserSchema = new Schema<IUser>(
   {
     user_id: { type: String },
     fullName: { type: String, required: true },
+    contactNo: { type: String, required: false },
     email: { type: String, required: true },
+    socialMedia: [
+  {
+    platform: { type: String, required: true },
+    url: { type: String, required: true },
+  },
+],
     password: { type: String, required: true },
 
     role: {
@@ -56,6 +66,7 @@ const UserSchema = new Schema<IUser>(
     },
 
     avatarUrl: { type: String },
+    location: { type: String },
     isOnboarded: { type: Boolean, default: false },
 
     trainerProfile: {

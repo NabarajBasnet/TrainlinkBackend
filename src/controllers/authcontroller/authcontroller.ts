@@ -2,6 +2,7 @@ import ConnectDatabase from "../../config/db";
 import User from "../../models/Users/Users";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { nanoid } from "nanoid";
 
 export const SignUpUser = async (req: any, res: any) => {
   try {
@@ -18,8 +19,9 @@ export const SignUpUser = async (req: any, res: any) => {
         redirect: "/auth",
       });
     }
-
+    const user_id = nanoid(4).toString().toUpperCase();
     const finalData = {
+      user_id,
       fullName,
       email,
       password: hashedPassword,

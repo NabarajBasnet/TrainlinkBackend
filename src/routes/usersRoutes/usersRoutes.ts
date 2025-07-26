@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addTrainerExperties,
+  changePersonalDetails,
   editFitnessGoals,
   loggedInUserDetails,
   removeFitnessGoal,
@@ -26,5 +27,6 @@ router.route("/edit-fitness-goal").patch(editFitnessGoals);
 router.route("/remove-fitness-goal").patch(removeFitnessGoal);
 router.route("/share-fitness-level").patch(shareFitnessGoal);
 router.route("/share-health-condition").patch(shareHealthCondition);
+router.route("/update-personal-details").patch(changePersonalDetails);
 
 export default router;

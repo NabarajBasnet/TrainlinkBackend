@@ -371,6 +371,52 @@ export const shareHealthCondition = async (req: Request, res: Response) => {
     }
 
     user.memberProfile.healthCondition = req.body[0];
+    user.memberProfile.setupStage = 3;
+    await user.save();
+
+    res.status(200).json({
+      message: "Your changes are saved successfully",
+    });
+  } catch (error: any) {
+    console.error("Error: ", error);
+    res.status(500).json({
+      message: error.message || "Failed to remove fitness goals",
+    });
+  }
+};
+
+export const changePersonalDetails = async (req: Request, res: Response) => {
+  try {
+    await ConnectDatabase();
+
+    const JWT_TOKEN = process.env.JWT_SECRET;
+    if (!JWT_TOKEN) {
+      throw new Error("JWT_SECRET is not defined in env");
+    }
+
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "No token provided" });
+    }
+
+    const loggedInUser = jwt.verify(token, JWT_TOKEN) as { id: string };
+    const { id } = loggedInUser;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { fullName, email, contactNo, location, facebook, instagram } =
+      req.body;
+    user.fullName = fullName;
+    user.email = email;
+    user.contactNo = contactNo;
+    user.location = location;
+    user.socialMedia = [
+      { platform: "facebook", url: facebook },
+      { platform: "instagram", url: instagram },
+    ];
     await user.save();
 
     res.status(200).json({
