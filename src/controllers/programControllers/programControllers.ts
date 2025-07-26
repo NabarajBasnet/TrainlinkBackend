@@ -35,7 +35,22 @@ export const createNewProgram = async (req: Request, res: Response) => {
 export const getMyPrograms = async (req: Request, res: Response) => {
   try {
     await ConnectDatabase();
-    console.log(req.body);
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const token = req.cookies.token;
+    const loggedInUser = jwt.verify(token, JWT_SECRET);
+    const { id } = loggedInUser;
+
+    const baseQuery = {};
+    if (id) {
+      baseQuery.trainerId = id;
+    }
+
+    const programs = await Program.find(baseQuery)
+      .sort({ createdAt: -1 })
+      .populate("trainerId");
+    res.status(200).json({
+      programs,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
