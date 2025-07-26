@@ -26,6 +26,8 @@ export interface IUser extends Document {
     }[];
     yearsOfExperience?: number;
     priceRange?: number;
+    clients?: number;
+    completedPrograms?: number;
     location?: string[];
     availability?: string[];
     ratings?: number;
@@ -40,6 +42,7 @@ export interface IUser extends Document {
     healthCondition: string;
     preferredTrainingStyle?: string;
     setupStage?: number;
+    completedPlans?: number;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -52,11 +55,11 @@ const UserSchema = new Schema<IUser>(
     contactNo: { type: String, required: false },
     email: { type: String, required: true },
     socialMedia: [
-  {
-    platform: { type: String, required: true },
-    url: { type: String, required: true },
-  },
-],
+      {
+        platform: { type: String, required: true },
+        url: { type: String, required: true },
+      },
+    ],
     password: { type: String, required: true },
 
     role: {
@@ -86,6 +89,8 @@ const UserSchema = new Schema<IUser>(
 
       yearsOfExperience: { type: Number },
       priceRange: { type: Number },
+      clients: { type: Number },
+      completedPrograms: { type: Number, default: 0 },
       location: { type: String },
       availability: [{ type: String }],
       ratings: { type: Number, default: 1 },
@@ -104,6 +109,7 @@ const UserSchema = new Schema<IUser>(
         type: Number,
         default: 1,
       },
+      completedPlans: { type: Number, default: 0 },
     },
   },
   {

@@ -9,6 +9,7 @@ import corsOptions from "../src/config/cors";
 import authRoutes from "./routes/authroutes/authroutes";
 import userRoutes from "./routes/usersRoutes/usersRoutes";
 import fileUploadRoutes from "./routes/fileupload/fileuploadRoute";
+import programRoutes from "./routes/programRoutes/programRoutes";
 
 // Load env variables
 const port = process.env.PORT || 4000;
@@ -28,6 +29,9 @@ app.use("/api", userRoutes);
 
 // File Upload Routes
 app.use("/api", fileUploadRoutes);
+
+// Program Routes
+app.use("/api", programRoutes);
 
 const server = http.createServer(app);
 const io = new Server(server);
