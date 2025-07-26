@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import ConnectDatabase from "../../config/db";
 import jwt from "jsonwebtoken";
 import User from "../../models/Users/Users";
-import { Program } from "../../models/TrainerProgram/TrainerProgram";
+import { Program } from "../../models/Programs/Programs";
 
 export const createNewProgram = async (req: Request, res: Response) => {
   try {

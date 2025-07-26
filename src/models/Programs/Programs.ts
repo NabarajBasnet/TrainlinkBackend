@@ -30,6 +30,11 @@ const ProgramSchema = new Schema(
       type: Number,
       default: 0,
     },
+    status: {
+      type: String,
+      enum: ["Active", "Inactive", "Disabled", "Pending"],
+      default: "Active",
+    },
     category: {
       type: String,
     },
