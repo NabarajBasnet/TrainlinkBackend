@@ -59,22 +59,17 @@ export const getMyPrograms = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteSingleProgram = async (req: Request, res: Response) => {
+export const deleteSelectedPrograms = async (req: Request, res: Response) => {
   try {
     await ConnectDatabase();
-    console.log(req.body);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      message: error.message,
+    const { programIds } = req.body;
+    await Program.deleteMany({
+      _id: { $in: programIds },
     });
-  }
-};
 
-export const deleteBulkPrograms = async (req: Request, res: Response) => {
-  try {
-    await ConnectDatabase();
-    console.log(req.body);
+    res.status(200).json({
+      message: "Selected documents are deleted successfully",
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
