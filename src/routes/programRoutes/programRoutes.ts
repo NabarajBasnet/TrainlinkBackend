@@ -1,15 +1,28 @@
 import express from "express";
+import { authenticateToken, optionalAuth } from "../../middleware/auth";
 import {
-  createNewProgram,
-  deleteSelectedPrograms,
-  editProgram,
+  createProgram,
+  getAllPrograms,
   getMyPrograms,
+  getProgramById,
+  updateProgram,
+  deleteProgram,
+  toggleFavorite,
+  getFavoritePrograms,
 } from "../../controllers/programControllers/programControllers";
+
 const router = express.Router();
 
-router.route("/create-new-program").post(createNewProgram);
-router.route("/get-my-programs").get(getMyPrograms);
-router.route("/delete-programs").delete(deleteSelectedPrograms);
-router.route("/edit-program").put(editProgram);
+// Protected routes (require authentication)
+router.post("/create-program", authenticateToken, createProgram);
+router.get("/get-my-programs", authenticateToken, getMyPrograms);
+router.get("/get-program/:id", authenticateToken, getProgramById);
+router.put("/update-program/:id", authenticateToken, updateProgram);
+router.delete("/delete-program/:id", authenticateToken, deleteProgram);
+router.post("/toggle-favorite/:programId", authenticateToken, toggleFavorite);
+router.get("/get-favorite-programs", authenticateToken, getFavoritePrograms);
+
+// Public routes (optional authentication)
+router.get("/get-all-programs", optionalAuth, getAllPrograms);
 
 export default router;

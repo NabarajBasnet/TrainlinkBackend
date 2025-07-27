@@ -5,15 +5,15 @@ const TrainingRequestSchema = new Schema(
     memberId: { type: Types.ObjectId, ref: "users", required: true },
 
     goal: { type: String, required: true },
-    description: { type: String },
-    preferredDaysPerWeek: { type: Number },
+    description: { type: String, required: true },
+    preferredDaysPerWeek: { type: Number, required: true },
+    budgetPerWeek: { type: Number, required: true },
     availableTimeSlots: [{ type: String }],
-    budgetPerWeek: { type: Number },
 
     status: {
       type: String,
-      enum: ["Open", "Matched", "Closed"],
-      default: "Open",
+      enum: ["Active", "Inactive", "Disabled", "Pending"],
+      default: "Active",
     },
   },
   {
