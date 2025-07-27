@@ -33,26 +33,26 @@ export interface IUser extends Document {
     ratings?: number;
     setupStage?: number;
     isVerified?: boolean;
-    verificationStatus?: 'pending' | 'approved' | 'rejected';
-    verificationApplication?: {
-      submittedAt: Date;
-      reviewedAt?: Date;
-      reviewedBy?: string;
-      rejectionReason?: string;
-      documents: {
-        governmentId: string;
-        businessLicense?: string;
-      };
-      fullName?: string;
-      email?: string;
-      phoneNumber?: string;
-      businessName?: string;
-      businessType?: string;
-      website?: string;
-      socialMediaHandles?: string;
-      reasonForVerification?: string;
-      additionalInfo?: string;
-    };
+    verificationStatus?: "Pending" | "Approved" | "Rejected";
+    // verificationApplication?: {
+    //   submittedAt?: Date;
+    //   reviewedAt?: Date;
+    //   reviewedBy?: string;
+    //   rejectionReason?: string;
+    //   documents: {
+    //     governmentId: string;
+    //     businessLicense?: string;
+    //   };
+    //   fullName?: string;
+    //   email?: string;
+    //   phoneNumber?: string;
+    //   businessName?: string;
+    //   businessType?: string;
+    //   website?: string;
+    //   socialMediaHandles?: string;
+    //   reasonForVerification?: string;
+    //   additionalInfo?: string;
+    // };
   };
   memberProfile?: {
     goals: string[];
@@ -119,19 +119,19 @@ const UserSchema = new Schema<IUser>(
       isVerified: { type: Boolean, default: false },
       verificationStatus: {
         type: String,
-        enum: ['pending', 'approved', 'rejected'],
-        default: 'pending',
+        enum: ["Pending", "Approved", "Initial", "Rejected"],
+        default: "Initial",
       },
-      verificationApplication: {
-        submittedAt: { type: Date, required: true },
-        reviewedAt: { type: Date },
-        reviewedBy: { type: String },
-        rejectionReason: { type: String },
-        documents: {
-          governmentId: { type: String, required: true },
-          businessLicense: { type: String },
-        },
-      },
+      // verificationApplication: {
+      //   submittedAt: { type: Date, required: false },
+      //   reviewedAt: { type: Date },
+      //   reviewedBy: { type: String },
+      //   rejectionReason: { type: String },
+      //   documents: {
+      //     governmentId: { type: String, required: true },
+      //     businessLicense: { type: String },
+      //   },
+      // },
     },
 
     memberProfile: {

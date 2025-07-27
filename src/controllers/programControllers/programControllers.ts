@@ -4,6 +4,7 @@ import { Program } from "../../models/Programs/Programs";
 // Create new program
 export const createProgram = async (req: Request, res: Response) => {
   try {
+    console.log(req)
     const trainerId = req.user?.id;
 
     if (!trainerId) {
@@ -24,7 +25,7 @@ export const createProgram = async (req: Request, res: Response) => {
       ...req.body,
       trainerId,
       availableSlots: req.body.maxSlot,
-      status: req.body.status || 'Active', // Add default status
+      status: req.body.status || 'Active',
     };
 
     const newProgram = new Program(programData);

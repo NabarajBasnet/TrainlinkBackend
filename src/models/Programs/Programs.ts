@@ -6,7 +6,6 @@ const ProgramSchema = new Schema(
 
     title: { type: String, required: true },
     description: { type: String, required: true },
-    category: { type: String, required: true },
     level: {
       type: String,
       enum: ["Beginner", "Intermediate", "Advanced"],
@@ -21,11 +20,19 @@ const ProgramSchema = new Schema(
         return this.maxSlot;
       },
     },
+    category: { type: String, required: true },
+
+    // Status and visibility
+    status: {
+      type: String,
+      enum: ["Active", "Inactive", "Draft", "Completed"],
+      default: "Active",
+    },
 
     // Program details
     goals: [{ type: String }],
     requirements: [{ type: String }],
-    whatYouWillLearn: [{ type: String }],
+    whatYouWillGet: [{ type: String }],
     equipment: [{ type: String }],
 
     // Media
@@ -35,27 +42,9 @@ const ProgramSchema = new Schema(
 
     // Ratings and reviews
     rating: { type: Number, default: 0 },
-    totalReviews: { type: Number, default: 0 },
-    reviews: [
-      {
-        userId: { type: Types.ObjectId, ref: "users" },
-        rating: { type: Number, required: true },
-        comment: { type: String },
-        createdAt: { type: Date, default: Date.now },
-      },
-    ],
-
-    // Status and visibility
-    status: {
-      type: String,
-      enum: ["Active", "Inactive", "Draft", "Completed"],
-      default: "Active",
-    },
 
     // Engagement
     views: { type: Number, default: 0 },
-    favorites: [{ type: Types.ObjectId, ref: "users" }],
-    enrollments: [{ type: Types.ObjectId, ref: "users" }],
 
     // Location and availability
     location: { type: String },
