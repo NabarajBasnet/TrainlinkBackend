@@ -13,8 +13,8 @@ import fileUploadRoutes from "./routes/fileupload/fileuploadRoute";
 import programRoutes from "./routes/programRoutes/programRoutes";
 import trainingReqRouter from "./routes/trainingRequestRoutes/trainingReqRoutes";
 import verificationRoutes from "./routes/verificationRoutes/verificationRoutes";
-import proposalRoutes from './routes/proposalRoutes/proposalRoutes';
-import enrollmentRoutes from './routes/enrollmentRoutes/enrollmentRoutes';
+import proposalRoutes from "./routes/proposalRoutes/proposalRoutes";
+import enrollmentRoutes from "./routes/enrollmentRoutes/enrollmentRoutes";
 
 // Load env variables
 const port = process.env.PORT || 4000;
@@ -54,8 +54,11 @@ app.use("/api", trainingReqRouter);
 // Verification Routes
 app.use("/api", verificationRoutes);
 
-app.use('/api/proposals', proposalRoutes);
-app.use('/api/enrollments', enrollmentRoutes);
+// Proposals Routes
+app.use("/api", proposalRoutes);
+
+// Enrollments Routes
+app.use("/api", enrollmentRoutes);
 
 const server = http.createServer(app);
 
@@ -63,24 +66,24 @@ const server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+  },
 });
 
 // Store user socket mappings
 const userSockets = new Map<string, string>();
 
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
 
   // Authenticate user and store mapping
-  socket.on('authenticate', (userId: string) => {
+  socket.on("authenticate", (userId: string) => {
     userSockets.set(userId, socket.id);
     socket.join(userId);
     console.log(`User ${userId} authenticated and joined room`);
   });
 
-  socket.on('disconnect', () => {
+  socket.on("disconnect", () => {
     // Remove user mapping
     for (const [userId, socketId] of userSockets.entries()) {
       if (socketId === socket.id) {
@@ -88,12 +91,12 @@ io.on('connection', (socket) => {
         break;
       }
     }
-    console.log('User disconnected:', socket.id);
+    console.log("User disconnected:", socket.id);
   });
 });
 
 // Make io available to routes
-app.set('io', io);
+app.set("io", io);
 
 server.listen(port, () => {
   console.log(`Server listening on port: ${port}`);

@@ -3,67 +3,54 @@ import { Proposal } from "../../models/Proposal/Proposal";
 import { Enrollment } from "../../models/Enrollment/Enrollment";
 import { Program } from "../../models/Programs/Programs";
 import User from "../../models/Users/Users";
+import jwt from "jsonwebtoken";
+import ConnectDatabase from "../../config/db";
+import mongoose from "mongoose";
+import { ObjectId } from "mongoose";
 
 export class ProposalController {
   // Create a new proposal
-  static async createProposal(req: Request, res: Response) {
-    try {
-      const { planId, memberId, message } = req.body;
-      const trainerId = (req as any).user.id;
 
-      // Check if proposal already exists
+  async createProposal(req: Request, res: Response) {
+    try {
+      await ConnectDatabase();
+      const JWT_SECRET = process.env.JWT_SECRET!;
+      const token = req.cookies.token;
+      const loggedInUser = jwt.verify(token, JWT_SECRET) as { id: string };
+      const { id } = loggedInUser;
+
+      let { memberId, planId, message } = req.body;
+
+      // Convert to ObjectId
+      const trainerId = new mongoose.Types.ObjectId(id);
+      memberId = new mongoose.Types.ObjectId(memberId);
+      planId = new mongoose.Types.ObjectId(planId);
+
+      // Check if already proposed
       const existingProposal = await Proposal.findOne({
         trainerId,
         memberId,
         planId,
-        status: "pending",
       });
 
       if (existingProposal) {
-        return res.status(400).json({
-          success: false,
-          message: "You have already sent a proposal for this plan",
+        return res.status(401).json({
+          message: "You've already sent a proposal for this training request.",
         });
       }
 
-      // Verify the plan exists and belongs to the member
-      const plan = await Program.findById(planId);
-      if (!plan || plan.userId.toString() !== memberId) {
-        return res.status(404).json({
-          success: false,
-          message: "Plan not found",
-        });
-      }
-
-      const proposal = new Proposal({
+      const newProposal = new Proposal({
         trainerId,
         memberId,
         planId,
         message,
       });
 
-      await proposal.save();
-
-      // Populate trainer info for notification
-      const trainer = await User.findById(trainerId).select(
-        "firstName lastName profilePicture"
-      );
-
-      // Emit real-time notification to member
-      const io = (req as any).app.get("io");
-      if (io) {
-        io.to(memberId).emit("newProposal", {
-          proposal: {
-            ...proposal.toObject(),
-            trainer: trainer,
-          },
-        });
-      }
+      await newProposal.save();
 
       res.status(201).json({
         success: true,
         message: "Proposal sent successfully",
-        data: proposal,
       });
     } catch (error) {
       console.error("Error creating proposal:", error);
@@ -75,7 +62,7 @@ export class ProposalController {
   }
 
   // Get proposals for a user (as trainer or member)
-  static async getProposals(req: Request, res: Response) {
+  async getProposals(req: Request, res: Response) {
     try {
       const userId = (req as any).user.id;
       const { role, status } = req.query;
@@ -115,7 +102,7 @@ export class ProposalController {
   }
 
   // Respond to proposal (accept/reject)
-  static async respondToProposal(req: Request, res: Response) {
+  async respondToProposal(req: Request, res: Response) {
     try {
       const { proposalId } = req.params;
       const { action } = req.body; // 'accept' or 'reject'
@@ -184,7 +171,7 @@ export class ProposalController {
   }
 
   // Delete proposal (only by sender)
-  static async deleteProposal(req: Request, res: Response) {
+  async deleteProposal(req: Request, res: Response) {
     try {
       const { proposalId } = req.params;
       const trainerId = (req as any).user.id;

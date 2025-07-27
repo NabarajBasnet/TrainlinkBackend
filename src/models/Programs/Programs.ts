@@ -29,22 +29,13 @@ const ProgramSchema = new Schema(
       default: "Active",
     },
 
-    // Program details
-    goals: [{ type: String }],
-    requirements: [{ type: String }],
-    whatYouWillGet: [{ type: String }],
-    equipment: [{ type: String }],
-
-    // Media
-    coverImage: { type: String },
-    images: [{ type: String }],
-    videoUrl: { type: String },
-
     // Ratings and reviews
     rating: { type: Number, default: 0 },
 
     // Engagement
     views: { type: Number, default: 0 },
+    likes: { type: Number, default: 0 },
+    dislikes: { type: Number, default: 0 },
 
     // Location and availability
     location: { type: String },
@@ -53,14 +44,6 @@ const ProgramSchema = new Schema(
 
     // Tags for search
     tags: [{ type: String }],
-
-    // Schedule
-    schedule: {
-      daysPerWeek: { type: Number },
-      sessionsPerDay: { type: Number },
-      sessionDuration: { type: Number },
-      timeSlots: [{ type: String }],
-    },
   },
   {
     timestamps: true,

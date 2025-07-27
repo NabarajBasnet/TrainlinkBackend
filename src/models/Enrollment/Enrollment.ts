@@ -1,11 +1,11 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface IEnrollment extends Document {
   trainerId: mongoose.Types.ObjectId;
   memberId: mongoose.Types.ObjectId;
   planId: mongoose.Types.ObjectId;
   proposalId: mongoose.Types.ObjectId;
-  status: 'active' | 'completed' | 'cancelled';
+  status: "active" | "completed" | "cancelled";
   startDate: Date;
   endDate?: Date;
   progress: {
@@ -17,59 +17,65 @@ export interface IEnrollment extends Document {
   updatedAt: Date;
 }
 
-const EnrollmentSchema = new Schema<IEnrollment>({
-  trainerId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  memberId: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  planId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Program',
-    required: true
-  },
-  proposalId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Proposal',
-    required: true
-  },
-  status: {
-    type: String,
-    enum: ['active', 'completed', 'cancelled'],
-    default: 'active'
-  },
-  startDate: {
-    type: Date,
-    default: Date.now
-  },
-  endDate: {
-    type: Date
-  },
-  progress: {
-    completedSessions: {
-      type: Number,
-      default: 0
+const EnrollmentSchema = new Schema<IEnrollment>(
+  {
+    trainerId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    totalSessions: {
-      type: Number,
-      default: 0
+    memberId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    lastSessionDate: {
-      type: Date
-    }
+    planId: {
+      type: Schema.Types.ObjectId,
+      ref: "Program",
+      required: true,
+    },
+    proposalId: {
+      type: Schema.Types.ObjectId,
+      ref: "Proposal",
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["active", "completed", "cancelled"],
+      default: "active",
+    },
+    startDate: {
+      type: Date,
+      default: Date.now,
+    },
+    endDate: {
+      type: Date,
+    },
+    progress: {
+      completedSessions: {
+        type: Number,
+        default: 0,
+      },
+      totalSessions: {
+        type: Number,
+        default: 0,
+      },
+      lastSessionDate: {
+        type: Date,
+      },
+    },
+  },
+  {
+    timestamps: true,
   }
-}, {
-  timestamps: true
-});
+);
 
 // Indexes
 EnrollmentSchema.index({ trainerId: 1, status: 1 });
 EnrollmentSchema.index({ memberId: 1, status: 1 });
 EnrollmentSchema.index({ proposalId: 1 }, { unique: true });
 
-export const Enrollment = mongoose.model<IEnrollment>('Enrollment', EnrollmentSchema); 
+export const Enrollment = mongoose.model<IEnrollment>(
+  "Enrollment",
+  EnrollmentSchema
+);
