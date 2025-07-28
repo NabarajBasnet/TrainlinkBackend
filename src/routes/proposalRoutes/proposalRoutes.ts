@@ -13,6 +13,13 @@ router.get(
   proposalController.getProposals
 );
 
+// Get proposals (Members only)
+router.get(
+  "/get-members-proposals",
+  authenticateToken,
+  proposalController.getProposalsFromMember
+);
+
 // Create proposal (trainers only)
 router.post(
   "/create-proposal",

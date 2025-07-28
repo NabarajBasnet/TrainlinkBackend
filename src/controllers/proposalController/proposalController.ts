@@ -59,7 +59,7 @@ export class ProposalController {
     }
   }
 
-  // Get proposals for a user (as trainer or member)
+  // Get proposals for a user (trainer only)
   async getProposals(req: Request, res: Response) {
     try {
       await ConnectDatabase();
@@ -68,12 +68,12 @@ export class ProposalController {
       const loggedInUser = jwt.verify(token, jwt_secret);
       const { id } = loggedInUser;
       const user = await User.findById(id);
-      const userRole = user.role;
 
       const pendingProposals = await Proposal.find({
         status: "Pending",
         trainerId: id,
       })
+        .sort({ createdAt: -1 })
         .populate("trainerId")
         .populate("memberId")
         .populate("planId");
@@ -82,6 +82,48 @@ export class ProposalController {
         treinerId: id,
         status: { $in: ["Accepted", "Rejected"] },
       })
+        .sort({ createdAt: -1 })
+        .populate("trainerId")
+        .populate("memberId")
+        .populate("planId");
+
+      res.status(200).json({
+        message: "Proposals are fetched",
+        pendingProposals,
+        resolvedProposals,
+      });
+    } catch (error) {
+      console.log("Error: ", error);
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+  }
+
+  // Get proposals for a user (members only)
+  async getProposalsFromMember(req: Request, res: Response) {
+    try {
+      await ConnectDatabase();
+      const jwt_secret = process.env.JWT_SECRET;
+      const token = req.cookies.token;
+      const loggedInUser = jwt.verify(token, jwt_secret);
+      const { id } = loggedInUser;
+      const user = await User.findById(id);
+
+      const pendingProposals = await Proposal.find({
+        status: "Pending",
+        memberId: id,
+      })
+        .sort({ createdAt: -1 })
+        .populate("trainerId")
+        .populate("memberId")
+        .populate("planId");
+
+      const resolvedProposals = await Proposal.find({
+        memberId: id,
+        status: { $in: ["Accepted", "Rejected"] },
+      })
+        .sort({ createdAt: -1 })
         .populate("trainerId")
         .populate("memberId")
         .populate("planId");
