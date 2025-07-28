@@ -79,8 +79,8 @@ export class ProposalController {
         .populate("planId");
 
       const resolvedProposals = await Proposal.find({
-        treinerId: id,
-        status: { $in: ["Accepted", "Rejected"] },
+        trainerId: id,
+        status: { $in: ["Accepted", "Rejected", "Cancelled"] },
       })
         .sort({ createdAt: -1 })
         .populate("trainerId")
@@ -121,7 +121,7 @@ export class ProposalController {
 
       const resolvedProposals = await Proposal.find({
         memberId: id,
-        status: { $in: ["Accepted", "Rejected"] },
+        status: { $in: ["Accepted", "Rejected", "Cancelled"] },
       })
         .sort({ createdAt: -1 })
         .populate("trainerId")
@@ -203,6 +203,101 @@ export class ProposalController {
       });
     } catch (error) {
       console.error("Error responding to proposal:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  // Cancell a proposal (cancell) (trainer only)
+  async cancellAProposal(req: Request, res: Response) {
+    try {
+      await ConnectDatabase();
+
+      const jwt_secret = process.env.JWT_SECRET!;
+      const token = req.cookies.token;
+
+      const loggedInUser = jwt.verify(token, jwt_secret) as { id: string };
+      const { id: trainerId } = loggedInUser;
+
+      const trainer = await User.findById(trainerId);
+      if (!trainer) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+
+      const { id, cancellationReason } = req.body;
+      const planId = new mongoose.Types.ObjectId(id);
+
+      const proposal = await Proposal.findOne({
+        _id: planId,
+        status: "Pending",
+      });
+
+      if (!proposal) {
+        return res.status(404).json({
+          success: false,
+          message: "Proposal not found or not in a pending state",
+        });
+      }
+
+      proposal.cancellationReason = cancellationReason;
+      proposal.status = "Cancelled";
+      await proposal.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Proposal is cancelled as per you request",
+      });
+    } catch (error) {
+      console.error("Error cancelling proposal:", error);
+      res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
+  }
+
+  // Resend a proposal (cancell) (trainer only)
+  async resendAProposal(req: Request, res: Response) {
+    try {
+      await ConnectDatabase();
+
+      const jwt_secret = process.env.JWT_SECRET!;
+      const token = req.cookies.token;
+
+      const loggedInUser = jwt.verify(token, jwt_secret) as { id: string };
+      const { id: trainerId } = loggedInUser;
+
+      const trainer = await User.findById(trainerId);
+      if (!trainer) {
+        return res.status(404).json({ message: "Trainer not found" });
+      }
+
+      const { id } = req.body;
+      const planId = new mongoose.Types.ObjectId(id);
+
+      const proposal = await Proposal.findOne({
+        _id: planId,
+        status: "Cancelled",
+      });
+
+      if (!proposal) {
+        return res.status(404).json({
+          success: false,
+          message: "Proposal not found or not in a cancelled state",
+        });
+      }
+
+      proposal.status = "Pending";
+      await proposal.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Proposal is recreated as per you request",
+      });
+    } catch (error) {
+      console.error("Error resending proposal:", error);
       res.status(500).json({
         success: false,
         message: "Internal server error",

@@ -27,6 +27,20 @@ router.post(
   proposalController.createProposal
 );
 
+// Cancell proposal (trainers only)
+router.patch(
+  "/cancell-proposal",
+  authenticateToken,
+  proposalController.cancellAProposal
+);
+
+// Resend proposal (trainers only)
+router.patch(
+  "/resend-proposal",
+  authenticateToken,
+  proposalController.resendAProposal
+);
+
 // Get proposals
 router.get("/", authenticateToken, async (req, res) => {
   try {

@@ -5,7 +5,8 @@ export interface IProposal extends Document {
   memberId: mongoose.Types.ObjectId;
   planId: mongoose.Types.ObjectId;
   message: string;
-  status: "Pending" | "Accepted" | "Rejected";
+  status: "Pending" | "Accepted" | "Rejected" | "Cancelled";
+  cancellationReason?: String;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,8 +35,11 @@ const ProposalSchema = new Schema<IProposal>(
     },
     status: {
       type: String,
-      enum: ["Pending", "Accepted", "Rejected"],
+      enum: ["Pending", "Accepted", "Rejected", "Cancelled"],
       default: "Pending",
+    },
+    cancellationReason: {
+      type: String,
     },
   },
   {
