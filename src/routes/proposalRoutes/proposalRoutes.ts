@@ -6,10 +6,12 @@ const proposalController = new ProposalController();
 
 const router = express.Router();
 
-// Simple test route
-router.get("/", (req, res) => {
-  res.json({ message: "Proposal routes working" });
-});
+// Get proposals (Trainers only)
+router.get(
+  "/get-proposals",
+  authenticateToken,
+  proposalController.getProposals
+);
 
 // Create proposal (trainers only)
 router.post(

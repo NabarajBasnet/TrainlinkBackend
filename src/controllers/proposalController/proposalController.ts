@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
 import { Proposal } from "../../models/Proposal/Proposal";
 import { Enrollment } from "../../models/Enrollment/Enrollment";
-import { Program } from "../../models/Programs/Programs";
 import User from "../../models/Users/Users";
 import jwt from "jsonwebtoken";
 import ConnectDatabase from "../../config/db";
 import mongoose from "mongoose";
-import { ObjectId } from "mongoose";
 
 export class ProposalController {
   // Create a new proposal
@@ -64,39 +62,39 @@ export class ProposalController {
   // Get proposals for a user (as trainer or member)
   async getProposals(req: Request, res: Response) {
     try {
-      const userId = (req as any).user.id;
-      const { role, status } = req.query;
+      await ConnectDatabase();
+      const jwt_secret = process.env.JWT_SECRET;
+      const token = req.cookies.token;
+      const loggedInUser = jwt.verify(token, jwt_secret);
+      const { id } = loggedInUser;
+      const user = await User.findById(id);
+      const userRole = user.role;
 
-      let query: any = {};
+      const pendingProposals = await Proposal.find({
+        status: "Pending",
+        trainerId: id,
+      })
+        .populate("trainerId")
+        .populate("memberId")
+        .populate("planId");
 
-      if (role === "trainer") {
-        query.trainerId = userId;
-      } else if (role === "member") {
-        query.memberId = userId;
-      } else {
-        // Get all proposals where user is involved
-        query.$or = [{ trainerId: userId }, { memberId: userId }];
-      }
-
-      if (status) {
-        query.status = status;
-      }
-
-      const proposals = await Proposal.find(query)
-        .populate("trainerId", "firstName lastName profilePicture")
-        .populate("memberId", "firstName lastName profilePicture")
-        .populate("planId", "title description")
-        .sort({ createdAt: -1 });
+      const resolvedProposals = await Proposal.find({
+        treinerId: id,
+        status: { $in: ["Accepted", "Rejected"] },
+      })
+        .populate("trainerId")
+        .populate("memberId")
+        .populate("planId");
 
       res.status(200).json({
-        success: true,
-        data: proposals,
+        message: "Proposals are fetched",
+        pendingProposals,
+        resolvedProposals,
       });
     } catch (error) {
-      console.error("Error fetching proposals:", error);
+      console.log("Error: ", error);
       res.status(500).json({
-        success: false,
-        message: "Internal server error",
+        message: error.message,
       });
     }
   }
