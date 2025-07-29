@@ -7,6 +7,8 @@ export interface IProposal extends Document {
   message: string;
   status: "Pending" | "Accepted" | "Rejected" | "Cancelled";
   cancellationReason?: String;
+  respondTitle?: String;
+  respondMessage?: String;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,6 +41,12 @@ const ProposalSchema = new Schema<IProposal>(
       default: "Pending",
     },
     cancellationReason: {
+      type: String,
+    },
+    respondTitle: {
+      type: String,
+    },
+    respondMessage: {
       type: String,
     },
   },
