@@ -173,8 +173,8 @@ export class ProposalController {
       }
 
       proposal.status = action;
-      proposal.responseTitle = responseTitle;
-      proposal.responseMessage = responseMessage;
+      proposal.respondTitle = responseTitle;
+      proposal.respondMessage = responseMessage;
       await proposal.save();
 
       res.status(200).json({
