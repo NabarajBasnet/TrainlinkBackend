@@ -144,62 +144,42 @@ export class ProposalController {
   // Respond to proposal (accept/reject)
   async respondToProposal(req: Request, res: Response) {
     try {
-      const { proposalId } = req.params;
-      const { action } = req.body; // 'accept' or 'reject'
-      const memberId = (req as any).user.id;
+      await ConnectDatabase();
+      const jwt_secret = process.env.JWT_SECRET;
+      const token = req.cookies.token;
+      const loggedInUser = jwt.verify(token, jwt_secret);
+      const { id: trainerId } = loggedInUser;
+      const user = await User.findById(trainerId);
+      const userRole = user.role;
+      if (userRole === "Member") {
+        return res.status(401).json({
+          message: "Unauthorized action",
+        });
+      }
 
-      const proposal = await Proposal.findById(proposalId);
-
+      const { id, action, responseTitle, responseMessage } = req.body;
+      const proposalObjId = new mongoose.Types.ObjectId(id);
+      const proposal = await Proposal.findById(proposalObjId);
       if (!proposal) {
-        return res.status(404).json({
-          success: false,
+        return res.status(401).json({
           message: "Proposal not found",
         });
       }
 
-      if (proposal.memberId.toString() !== memberId) {
-        return res.status(403).json({
-          success: false,
-          message: "Unauthorized",
+      if (proposal.status === "Cancelled") {
+        return res.status(401).json({
+          message: "Proposal is in cancelled state",
         });
       }
 
-      if (proposal.status !== "pending") {
-        return res.status(400).json({
-          success: false,
-          message: "Proposal has already been responded to",
-        });
-      }
-
-      const newStatus = action === "accept" ? "accepted" : "rejected";
-      proposal.status = newStatus;
+      proposal.status = action;
+      proposal.responseTitle = responseTitle;
+      proposal.responseMessage = responseMessage;
       await proposal.save();
-
-      // If accepted, create enrollment
-      if (action === "accept") {
-        const enrollment = new Enrollment({
-          trainerId: proposal.trainerId,
-          memberId: proposal.memberId,
-          planId: proposal.planId,
-          proposalId: proposal._id,
-        });
-        await enrollment.save();
-      }
-
-      // Emit real-time update to trainer
-      const io = (req as any).app.get("io");
-      if (io) {
-        io.to(proposal.trainerId.toString()).emit("proposalResponse", {
-          proposalId: proposal._id,
-          status: newStatus,
-          action,
-        });
-      }
 
       res.status(200).json({
         success: true,
         message: `Proposal ${action}ed successfully`,
-        data: proposal,
       });
     } catch (error) {
       console.error("Error responding to proposal:", error);

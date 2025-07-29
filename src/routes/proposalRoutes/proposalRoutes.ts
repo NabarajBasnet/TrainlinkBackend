@@ -41,6 +41,13 @@ router.patch(
   proposalController.resendAProposal
 );
 
+// Respond to proposal (members only)
+router.patch(
+  "/respond-proposal",
+  authenticateToken,
+  proposalController.respondToProposal
+);
+
 // Get proposals
 router.get("/", authenticateToken, async (req, res) => {
   try {
