@@ -151,7 +151,7 @@ export class ProposalController {
       const { id: trainerId } = loggedInUser;
       const user = await User.findById(trainerId);
       const userRole = user.role;
-      if (userRole === "Member") {
+      if (userRole === "Trainer") {
         return res.status(401).json({
           message: "Unauthorized action",
         });
@@ -179,7 +179,7 @@ export class ProposalController {
 
       res.status(200).json({
         success: true,
-        message: `Proposal ${action}ed successfully`,
+        message: `Proposal ${action} successfully`,
       });
     } catch (error) {
       console.error("Error responding to proposal:", error);
