@@ -1,7 +1,10 @@
 import express from "express";
 import { authenticateToken } from "../../middleware/auth";
-
+import { EnrollmentController } from "../../controllers/enrollmentController/enrollmentController";
 const router = express.Router();
+
+// Create enrollment
+router.route("/create-enrollment").post(EnrollmentController.createEnrollments);
 
 // Simple test route
 router.get("/test", (req, res) => {

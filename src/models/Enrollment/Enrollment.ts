@@ -5,7 +5,7 @@ export interface IEnrollment extends Document {
   memberId: mongoose.Types.ObjectId;
   planId: mongoose.Types.ObjectId;
   proposalId: mongoose.Types.ObjectId;
-  status: "active" | "completed" | "cancelled";
+  status: "Active" | "Completed" | "Cancelled";
   startDate: Date;
   endDate?: Date;
   progress: {
@@ -41,8 +41,8 @@ const EnrollmentSchema = new Schema<IEnrollment>(
     },
     status: {
       type: String,
-      enum: ["active", "completed", "cancelled"],
-      default: "active",
+      enum: ["Active", "Completed", "Cancelled"],
+      default: "Active",
     },
     startDate: {
       type: Date,
