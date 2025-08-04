@@ -5,6 +5,7 @@ import User from "../../models/Users/Users";
 import jwt from "jsonwebtoken";
 import ConnectDatabase from "../../config/db";
 import mongoose from "mongoose";
+import ConnectionModel from "../../models/ConnectionModels/ConnectionModel";
 
 export class ProposalController {
   // Create a new proposal
@@ -176,6 +177,33 @@ export class ProposalController {
       proposal.respondTitle = responseTitle;
       proposal.respondMessage = responseMessage;
       await proposal.save();
+
+      // 2. Check if connection already exists
+      const existingConnection = await ConnectionModel.findOne({
+        clientId: proposal.memberId,
+        trainerId: proposal.trainerId,
+      });
+
+      // 3. Create or update connection
+      if (!existingConnection) {
+        await ConnectionModel.create({
+          clientId: proposal.memberId,
+          trainerId: proposal.trainerId,
+          source: "Proposal",
+          status: "Active",
+          chatEnabled: true,
+          lastEngagementAt: new Date(),
+        });
+      } else {
+        // If it already exists, we might still update some fields
+        if (existingConnection.status !== "Blocked") {
+          existingConnection.status = "Active";
+          existingConnection.chatEnabled = true;
+          existingConnection.lastEngagementAt = new Date();
+          existingConnection.source = "Proposal"; // Optional override
+          await existingConnection.save();
+        }
+      }
 
       res.status(200).json({
         success: true,
