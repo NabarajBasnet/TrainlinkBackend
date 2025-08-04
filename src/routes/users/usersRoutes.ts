@@ -10,7 +10,7 @@ import {
   updateBioDetails,
   updateCertificationDetails,
   updateUserAvatar,
-} from "../../controllers/usersController/usersController";
+} from "../../controllers/users/usersController";
 import upload from "../../middleware/multer";
 const router = express.Router();
 

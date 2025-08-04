@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticateToken } from "../../middleware/auth";
-import { EnrollmentController } from "../../controllers/enrollmentController/enrollmentController";
+import { EnrollmentController } from "../../controllers/enrolls/enrollmentController";
 const router = express.Router();
 
 // Create enrollment

@@ -34,11 +34,11 @@ const EnrollmentSchema = new Schema<IEnrollment>(
       ref: "Program",
       required: true,
     },
-    proposalId: {
-      type: Schema.Types.ObjectId,
-      ref: "Proposal",
-      required: true,
-    },
+    // proposalId: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: "Proposal",
+    //   required: true,
+    // },
     status: {
       type: String,
       enum: ["Active", "Completed", "Cancelled"],

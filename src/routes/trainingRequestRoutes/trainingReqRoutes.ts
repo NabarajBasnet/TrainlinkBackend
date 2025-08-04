@@ -9,7 +9,7 @@ import {
   deleteTrainingRequest,
   deleteMultipleTrainingRequests,
   getAllTrainingRequests,
-} from "../../controllers/trainingRequestControllers/TrainingRequestControllers";
+} from "../../controllers/trainingRequests/TrainingRequestControllers";
 
 const router = express.Router();
 

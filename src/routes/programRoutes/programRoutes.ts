@@ -9,7 +9,7 @@ import {
   deleteProgram,
   toggleFavorite,
   getFavoritePrograms,
-} from "../../controllers/programControllers/programControllers";
+} from "../../controllers/program/programControllers";
 
 const router = express.Router();
 

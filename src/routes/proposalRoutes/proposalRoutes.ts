@@ -1,6 +1,6 @@
 import express from "express";
 import { authenticateToken } from "../../middleware/auth";
-import { ProposalController } from "../../controllers/proposalController/proposalController";
+import { ProposalController } from "../../controllers/proposal/proposalController";
 
 const proposalController = new ProposalController();
 

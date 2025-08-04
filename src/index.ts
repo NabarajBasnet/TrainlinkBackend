@@ -7,14 +7,15 @@ import cookieParser from "cookie-parser";
 import { Server as SocketIOServer } from "socket.io";
 import corsOptions from "../src/config/cors";
 import ConnectDatabase from "./config/db";
-import authRoutes from "./routes/authroutes/authroutes";
-import userRoutes from "./routes/usersRoutes/usersRoutes";
+import authRoutes from "./routes/auth/authroutes";
+import userRoutes from "./routes/users/usersRoutes";
 import fileUploadRoutes from "./routes/fileupload/fileuploadRoute";
 import programRoutes from "./routes/programRoutes/programRoutes";
 import trainingReqRouter from "./routes/trainingRequestRoutes/trainingReqRoutes";
 import verificationRoutes from "./routes/verificationRoutes/verificationRoutes";
 import proposalRoutes from "./routes/proposalRoutes/proposalRoutes";
 import enrollmentRoutes from "./routes/enrollmentRoutes/enrollmentRoutes";
+import connectionRoutes from "./routes/connections/connections";
 
 // Load env variables
 const port = process.env.PORT || 4000;
@@ -59,6 +60,9 @@ app.use("/api", proposalRoutes);
 
 // Enrollments Routes
 app.use("/api", enrollmentRoutes);
+
+// Connection Routes
+app.use("/api", connectionRoutes);
 
 const server = http.createServer(app);
 

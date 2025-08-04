@@ -3,7 +3,7 @@ import {
   LogInUser,
   LogOutUser,
   SignUpUser,
-} from "../../controllers/authcontroller/authcontroller";
+} from "../../controllers/auth/authcontroller";
 const router = express.Router();
 
 router.post("/auth/signup", SignUpUser);

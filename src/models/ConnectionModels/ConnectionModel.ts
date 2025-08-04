@@ -14,8 +14,8 @@ export interface IConnection extends Document {
 
 const ConnectionSchema: Schema<IConnection> = new Schema(
   {
-    clientId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    trainerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    clientId: { type: Schema.Types.ObjectId, ref: "users", required: true },
+    trainerId: { type: Schema.Types.ObjectId, ref: "users", required: true },
     source: { type: String, enum: ["Proposal", "Enrollment"], required: true },
     status: {
       type: String,
@@ -23,7 +23,7 @@ const ConnectionSchema: Schema<IConnection> = new Schema(
       default: "Active",
     },
     chatEnabled: { type: Boolean, default: true },
-    blockedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    blockedBy: { type: Schema.Types.ObjectId, ref: "users" },
     lastEngagementAt: { type: Date },
     endedAt: { type: Date },
   },

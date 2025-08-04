@@ -7,7 +7,6 @@ export class EnrollmentController {
   static async createEnrollments(req: Request, res: Response) {
     try {
       await ConnectDatabase();
-      console.log("Body: ", req.body);
 
       const { userId: memberId, programDetails } = req.body;
       const programId = programDetails._id;

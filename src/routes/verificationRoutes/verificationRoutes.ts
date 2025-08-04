@@ -5,7 +5,7 @@ import {
   applyForVerification,
   getVerificationApplications,
   updateVerificationStatus,
-} from "../../controllers/verificationController/verificationController";
+} from "../../controllers/verification/verificationController";
 
 const router = express.Router();
 

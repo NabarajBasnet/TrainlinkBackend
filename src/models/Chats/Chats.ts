@@ -37,7 +37,7 @@ const MessageSchema: Schema<IMessage> = new Schema(
     },
     attachments: [
       {
-        type: String, // URL to uploaded file/image
+        type: String,
       },
     ],
     sentAt: {
