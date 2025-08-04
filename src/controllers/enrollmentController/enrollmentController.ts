@@ -29,17 +29,17 @@ export class EnrollmentController {
         trainerId,
         memberId,
         planId: programId,
-        proposalId: programId, // ⚠️ You might want to replace this with actual proposalId if available
+        proposalId: programId,
         status: "Active",
         startDate: new Date(),
-        endDate: new Date(), // optionally change this to program end date logic
+        endDate: new Date(),
         progress,
       });
 
       res.status(200).json({
         success: true,
         message: "Enrolled successfully, wait for connection",
-        data: newEnrollment, // Optional: return the enrollment if needed
+        data: newEnrollment,
       });
     } catch (error) {
       console.error("Error creating enrollment:", error);

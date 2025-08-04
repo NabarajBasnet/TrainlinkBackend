@@ -1,38 +1,33 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const ConnectionSchema = new mongoose.Schema(
+export interface IConnection extends Document {
+  clientId: mongoose.Types.ObjectId;
+  trainerId: mongoose.Types.ObjectId;
+  source: "Proposal" | "Enrollment";
+  status: "Active" | "Completed" | "Blocked";
+  chatEnabled: boolean;
+  blockedBy?: mongoose.Types.ObjectId;
+  createdAt: Date;
+  lastEngagementAt?: Date;
+  endedAt?: Date;
+}
+
+const ConnectionSchema: Schema<IConnection> = new Schema(
   {
-    trainerId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
-      required: true,
-    },
-    memberId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "users",
-      required: true,
-    },
-    planId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "TrainingRequest",
-      required: true,
-    },
-    proposalId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Proposal",
-      required: true,
-    },
+    clientId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    trainerId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    source: { type: String, enum: ["Proposal", "Enrollment"], required: true },
     status: {
       type: String,
-      enum: ["Active", "Paused", "Completed", "Cancelled"],
+      enum: ["Active", "Completed", "Blocked"],
       default: "Active",
     },
-    startedAt: { type: Date, default: Date.now },
+    chatEnabled: { type: Boolean, default: true },
+    blockedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    lastEngagementAt: { type: Date },
+    endedAt: { type: Date },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-export const Connection =
-  mongoose.models.connection || mongoose.model("connection", ConnectionSchema);
+export default mongoose.model<IConnection>("Connection", ConnectionSchema);
