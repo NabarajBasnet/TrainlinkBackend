@@ -1,30 +1,25 @@
 import { Request, Response } from "express";
 import { Enrollment } from "../../models/Enrollment/Enrollment";
-import { Proposal } from "../../models/Proposal/Proposal";
 import ConnectDatabase from "../../config/db";
+import ConnectionModel from "../../models/ConnectionModels/ConnectionModel";
 
 export class EnrollmentController {
-  // Get enrollments for a user
   static async createEnrollments(req: Request, res: Response) {
     try {
       await ConnectDatabase();
       console.log("Body: ", req.body);
 
-      // Destructure the required data
       const { userId: memberId, programDetails } = req.body;
-
-      // Destructure trainerId and programId from programDetails
       const programId = programDetails._id;
       const trainerId = programDetails.trainerId._id;
 
-      // Define the progress object
       const progress = {
         completedSessions: 0,
         totalSessions: 0,
         lastSessionDate: undefined,
       };
 
-      // Create new enrollment
+      // 1. Create Enrollment
       const newEnrollment = await Enrollment.create({
         trainerId,
         memberId,
@@ -36,9 +31,36 @@ export class EnrollmentController {
         progress,
       });
 
+      // 2. Check if connection already exists
+      const existingConnection = await ConnectionModel.findOne({
+        clientId: memberId,
+        trainerId: trainerId,
+      });
+
+      // 3. Create or update connection
+      if (!existingConnection) {
+        await ConnectionModel.create({
+          clientId: memberId,
+          trainerId: trainerId,
+          source: "Enrollment",
+          status: "Active",
+          chatEnabled: true,
+          lastEngagementAt: new Date(),
+        });
+      } else {
+        // If it already exists, we might still update some fields
+        if (existingConnection.status !== "Blocked") {
+          existingConnection.status = "Active";
+          existingConnection.chatEnabled = true;
+          existingConnection.lastEngagementAt = new Date();
+          existingConnection.source = "Enrollment"; // Optional override
+          await existingConnection.save();
+        }
+      }
+
       res.status(200).json({
         success: true,
-        message: "Enrolled successfully, wait for connection",
+        message: "Enrolled and connection created",
         data: newEnrollment,
       });
     } catch (error) {
