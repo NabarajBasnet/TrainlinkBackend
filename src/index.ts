@@ -4,9 +4,10 @@ import dotenv from "dotenv";
 dotenv.config();
 import http from "http";
 import cookieParser from "cookie-parser";
-import { Server as SocketIOServer } from "socket.io";
 import corsOptions from "../src/config/cors";
 import ConnectDatabase from "./config/db";
+
+// Routes
 import authRoutes from "./routes/auth/authroutes";
 import userRoutes from "./routes/users/usersRoutes";
 import fileUploadRoutes from "./routes/fileupload/fileuploadRoute";
@@ -16,6 +17,7 @@ import verificationRoutes from "./routes/verificationRoutes/verificationRoutes";
 import proposalRoutes from "./routes/proposalRoutes/proposalRoutes";
 import enrollmentRoutes from "./routes/enrollmentRoutes/enrollmentRoutes";
 import connectionRoutes from "./routes/connections/connections";
+import { SocketInit } from "./config/socket";
 
 // Load env variables
 const port = process.env.PORT || 4000;
@@ -66,41 +68,7 @@ app.use("/api", connectionRoutes);
 
 const server = http.createServer(app);
 
-// Socket.IO setup
-const io = new SocketIOServer(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
-});
-
-// Store user socket mappings
-const userSockets = new Map<string, string>();
-
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
-
-  // Authenticate user and store mapping
-  socket.on("authenticate", (userId: string) => {
-    userSockets.set(userId, socket.id);
-    socket.join(userId);
-    console.log(`User ${userId} authenticated and joined room`);
-  });
-
-  socket.on("disconnect", () => {
-    // Remove user mapping
-    for (const [userId, socketId] of userSockets.entries()) {
-      if (socketId === socket.id) {
-        userSockets.delete(userId);
-        break;
-      }
-    }
-    console.log("User disconnected:", socket.id);
-  });
-});
-
-// Make io available to routes
-app.set("io", io);
+SocketInit(server);
 
 server.listen(port, () => {
   console.log(`Server listening on port: ${port}`);
